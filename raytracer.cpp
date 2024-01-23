@@ -1,98 +1,52 @@
 #include <windows.h>
+#include <cmath>
+#include "raytracer.h"
 
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
-void Update();
+void RenderFrame(HWND&, HDC&, struct Triangle&, struct Camera&);
 
-struct point // a value of 1 means 1 meter
+void RenderFrame(HWND& window_handle, struct Camera& camera, struct Triangle& triangle)
 {
-    float x;
-    float y;
-    float z;
-}
-
-struct rotation // a value of 1 means 1 degree
-{
-    float x;
-    float y;
-    float z;
-}
-
-struct color // valid values are from 0 to 255
-{
-    char r;
-    char g;
-    char b;
-    char a;
-}
-
-struct triangle
-{
-    point origin;
-    color color;
-    point v1;
-    point v2;
-    point v3;
-}
-
-struct ray
-{
-    point origin;
-    rotation direction;
-
-struct pixel
-{
-    point origin;;
-    color color;
-}
-
-struct camera // this camera uses points for light in each pixel,
-	      // but what if each pixel averaged a square grid of
-	      // light akin to a real camera? (points don't exist,
-	      // we just have really really small sensors in cams)
-{
-    pixel[3840][2160] pixelGrid;
-    int pixelWidth;
-    int pixelHeight;
-    float sensorWidth;
-    float sensorHeight
-    float sensorDistance;
-    point focusPoint;
-    point origin;
-    ray cameraRay;
-}
-
-void setSensorWidth(struct camera&, float);
-
-void cameraUpdate(struct camera& thisCamera)
-{
-    float pixeltopixeldistance = thisCamera.sensorWidth / thisCamera.pixelWidth
-    thisCamera.sensorHeight = pixeltopixeldistance * pixelHeight;
+    float length;
+    int x;
     int y;
-    int z;
-    for (y = 0; y < thisCamera.pixelWidth; y++)
+    Point pixelPoint;
+    Point E1;
+    Point E2;
+
+    Color colorVal;
+    Ray ray;
+    PAINTSTRUCT paint_struct;
+    HDC hdc = BeginPaint(window_handle, &paint_struct);
+    float pixeltopixeldistance = camera.sensorWidth / camera.pixelWidth;
+    camera.sensorHeight = pixeltopixeldistance * camera.pixelHeight;
+    ray.origin = camera.origin;
+    for (x = 0; x < camera.pixelWidth; x++)
     {
-	for (z = 0; z < thisCamera.pixelHeight; z++)
+	for (y = 0; y < camera.pixelHeight; y++)
 	{
-	    thisCamera.pixelGrid[y][z].origin.x = sensorDistance;
-	    thisCamera.pixelGrid[y][z].origin.y = (y * pixeltopixeldistance) - (0.5 * pixelWidth * pixeltopixeldistance);
-	    thisCamera.pixelGrid[y][z].origin.z = (y * pixeltopixeldistance) - (0.5 * pixelHeight * pixeltopixeldistance);
+	    // Background color
+	    colorVal.r = 0;
+	    colorVal.g = 10;
+	    colorVal.b = 200;
+	    // Set direction of the ray based on where the pixel should be relative to the origin
+	    ray.direction.x = camera.sensorDistance - ray.origin.x;
+	    ray.direction.y = (x * pixeltopixeldistance) - (0.5 * camera.pixelWidth * pixeltopixeldistance) - ray.origin.y;
+	    ray.direction.z = (y * pixeltopixeldistance) - (0.5 * camera.pixelHeight * pixeltopixeldistance) - ray.origin.z;
+	    // Normalize the vector
+            length = std::sqrt(ray.direction.x * ray.direction.x
+			     + ray.direction.y * ray.direction.y
+			     + ray.direction.z * ray.direction.z);
+	    ray.direction.x = ray.direction.x / length;
+	    ray.direction.y = ray.direction.y / length;
+	    ray.direction.z = ray.direction.z / length;
+
+	    SetPixel(hdc, x, y, RGB(colorVal.r, colorVal.g, colorVal.b));
 	}
     }
-}
-
-void cameraShoot(struct camera& thisCamera)
-{
-    
-    int y;
-    int z;
-    for (y = 0; y < thisCamera.pixelWidth; y++)
-    {
-	for (z = 0; z < thisCamera.pixelHeight; z++)
-	{
-            thisCamera.pixelGrid[y][z].
-	}
-    }
+    EndPaint(window_handle, &paint_struct);
+    InvalidateRect(window_handle, NULL, TRUE);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -103,16 +57,17 @@ int WINAPI WinMain(HINSTANCE hInstance,
     HWND window_handle;
     WNDCLASSEX window_class_info;
     MSG win_event_messages;
-    triangle triangle;
+    
+    struct Camera camera;
 
-    ZeroMemory(&triangle, sizeof(Triangle));
+    struct Triangle triangle;
 
-    ZeroMemory(&camera, sizeof(Camera));
-    Camera.endx = 1920;
-    Camera.endy = 1080;
-    Camera.pixelGrid
-    //setSensorWidth(camera, 0.1);
-    //setSensorDistance(camera, 0.1);
+    ZeroMemory(&triangle, sizeof(struct Triangle));
+
+    ZeroMemory(&camera, sizeof(struct Camera));
+
+    camera.sensorDistance = 0.1;
+    camera.sensorWidth = 0.1;
 
     ZeroMemory(&window_class_info, sizeof(WNDCLASSEX));
     
@@ -141,37 +96,24 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     ShowWindow(window_handle, nCmdShow);
 
-    while (GetMessage(&win_event_messages, NULL, 0, 0))
+    while (true)
     {
-        TranslateMessage(&win_event_messages);
-        DispatchMessage(&win_event_messages);
+        while (GetMessage(&win_event_messages, NULL, 0, 0))
+        {
+            TranslateMessage(&win_event_messages);
+            DispatchMessage(&win_event_messages);
+        }
+	camera.pixelWidth = LOWORD(win_event_messages.lParam);
+	camera.pixelHeight = HIWORD(win_event_messages.lParam);
+	RenderFrame(window_handle, camera, triangle);
     }
-
     return win_event_messages.wParam;
 }
 
 LRESULT CALLBACK WindowProc(HWND window_handle, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    int window_width = LOWORD(lParam);
-    int window_height = HIWORD(lParam);
-    PAINTSTRUCT paint_struct;
-    HDC hdc;
     switch(message)
     {
-	case WM_PAINT:
-        {
-	    hdc = BeginPaint(window_handle, &paint_struct);
-            SetPixel(hdc, camera);
-
-	    EndPaint(window_handle, &paint_struct);
-	    break;
-	}
-	case WM_SIZE:
-	{
-	    window_width = LOWORD(lParam);
-	    window_height = HIWORD(lParam);
-	    break;
-	}
         case WM_DESTROY:
         {
             PostQuitMessage(0);
@@ -179,5 +121,5 @@ LRESULT CALLBACK WindowProc(HWND window_handle, UINT message, WPARAM wParam, LPA
 	    break;
         }
     }
-    return DefWindowProc (window_handle, message, wParam, lParam);
+    return DefWindowProc(window_handle, message, wParam, lParam);
 }

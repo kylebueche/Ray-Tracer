@@ -1,8 +1,5 @@
-raytracer.exe : raytracer.o
-	g++ -o raytracer.exe raytracer.o
+main.exe : main.o
+	gcc -o main.exe main.o -luser32 -lgdi32
 
-raytracer.o : raytracer.cpp
-	g++ -ansi -pedantic-errors -Wall -c raytracer.cpp
-
-clean:
-	rm edit raytracer.o
+main.o : main.c
+	gcc -ansi -pedantic-errors -Wall -c main.c
