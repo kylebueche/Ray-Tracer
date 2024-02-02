@@ -1,16 +1,28 @@
-struct vector3d
+#ifndef VECTORMATH_H
+#define VECTORMATH_H
+
+#include "mymath.h"
+
+typedef struct
 {
-    double x;
-    double y;
-    double z;
-}
+    double x, y, z;
+} Vector;
 
-vector3d v3dAdd(vector3d&, vector3d&);
+typedef Vector Point;
 
-vector3d v3dSubtract(vector3d&, vector3d&);
+void vecAdd(Vector *, const Vector);
+void vecSub(Vector *, const Vector);
+void vecMult(Vector *, double);
+void vecDiv(Vector *, double);
+Vector vecNeg(const Vector);
+Vector vecsAdd(const Vector, const Vector);
+Vector vecsSub(const Vector, const Vector);
+Vector vecsMult(const Vector, const Vector);
+Vector vecsDiv(const Vector, const Vector);
+double vecLenSqr(const Vector);
+double vecLen(const Vector);
+double vecNormalize(Vector *);
+double vecDot(const Vector, const Vector);
+Vector vecCross(const Vector, const Vector);
 
-vector3d v3dMultiply(vector3d&, double);
-
-vector3d v3dDivide(vector3d&, double);
-
-double v3dLength(vector3d&);
+#endif

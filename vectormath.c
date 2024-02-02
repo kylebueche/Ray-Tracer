@@ -1,47 +1,96 @@
 #include "vectormath.h"
-#include "math.h"
 
-
-inline void v3dAdd(vector3d& a, vector3d& b)
+void vecAdd(Vector *a, const Vector b)
 {
-    a = { (a.x + b.x), (a.y + b.y), (a.z + b.z) };
+    a->x += b.x;
+    a->y += b.y;
+    a->z += b.z;
 }
 
-inline void v3dSubtract(vector3d& a, vector3d& b);
+void vecSub(Vector *a, const Vector b)
 {
-    a = { (a.x - b.x), (a.y - b.y), (a.z - b.z) };
+    a->x -= b.x;
+    a->y -= b.y;
+    a->z -= b.z;
 }
 
-inline void v3dMultiply(vector3d& a, double b);
+void vecMult(Vector *a, double b)
 {
-    a = { (a.x * b), (a.y * b), (a.z * b) };
+    a->x *= b;
+    a->y *= b;
+    a->z *= b;
 }
 
-inline void v3dDivide(vector3d& a, double b);
+void vecDiv(Vector *a, double b)
 {
-    a = { (a.x / b), (a.y / b), (a.z / b) };
+    a->x /= b;
+    a->y /= b;
+    a->z /= b;
 }
 
-inline double v3dLengthSqr(vector3d& a)
+Vector vecNeg(Vector a)
+{
+    a.x *= -1.0;
+    a.y *= -1.0;
+    a.z *= -1.0;
+    return a;
+}
+
+Vector vecsAdd(Vector a, const Vector b)
+{
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+    return a;
+}
+
+Vector vecsSub(Vector a, const Vector b)
+{
+    a.x -= b.x;
+    a.y -= b.y;
+    a.z -= b.z;
+    return a;
+}
+
+Vector vecsMult(Vector a, const Vector b)
+{
+    a.x *= b.x;
+    a.y *= b.y;
+    a.z *= b.z;
+    return a;
+}
+
+Vector vecsDiv(Vector a, const Vector b)
+{
+    a.x /= b.x;
+    a.y /= b.y;
+    a.z /= b.z;
+    return a;
+}
+
+double vecLenSqr(const Vector a)
 {
     return sqr(a.x) + sqr(a.y) + sqr(a.z);
-
-inline double v3dLength(vector3d& a);
-{
-    return sqrt(v3dLengthSqr(a));
 }
 
-inline v3dNormalize
-
-inline float v3dNormalized(vector3d& a);
+double vecLen(const Vector a)
 {
-    v3dDivide(a, v3dLength(a));
+    return sqrt(vecLenSqr(a));
 }
 
-inline void v3dDotProduct(vector3d& u, vector3d& v)
+double vecNormalize(Vector *a)
 {
-   /* v3dLength(a) * v3dLength(b) * cos( ??? */
+    double b = vecLen(*a);
+    vecDiv(a, b);
+    return b;
 }
 
-inline void v3dCrossProduct(vector3d& u, vector3d& v)
+double vecDot(const Vector a, const Vector b)
 {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+/**
+Vector vecCross(const Vector a, const Vector b)
+{
+    return (Vector) { (a.y * b.z - a.z * b.y), (a.z * b.x - a.x * b.z), (a.x * b.y - a.y * b.x) };
+}**/

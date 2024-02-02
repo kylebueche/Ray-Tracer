@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "mymath.h"
+#include "vectormath.h"
+#include "intersections.h"
+
 struct
 {
     int width;
@@ -20,6 +24,9 @@ static HDC frame_device_context;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
+    Plane plane = { 0 };
+    Ray ray = { 0 };
+    long int color;
     int x;
     int y;
     static WNDCLASS window_class = { 0 };
@@ -49,6 +56,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     else
     {
         ShowWindow(window_handle, nCmdShow);
+
+        plane.normal.z = 1.0;
+        ray.point.z = 1.0;
+
         while (!quit)
         {
             static MSG message = { 0 };
@@ -57,12 +68,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
                 TranslateMessage(&message);
                 DispatchMessage(&message);
             }
-            /* This is where we do everything for the game.  yuhhh */
+            /* This is where we do everything for the game. */
             for (x = 0; x < pixelGrid.width; x++)
             {
                 for (y = 0; y < pixelGrid.height; y++)
                 {
-                    pixelGrid.pixels[(y * pixelGrid.width + x)] = 0x00553322;
+                    if (intersectsPlane(ray, plane) == -1.0)
+                    {
+                        pixelGrid.pixels[(y * pixelGrid.width + x)] = 0x0000ffff;
+                    }
                 }
             }
             InvalidateRect(window_handle, NULL, FALSE);

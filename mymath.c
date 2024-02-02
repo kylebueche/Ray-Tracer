@@ -1,9 +1,11 @@
-inline double sqr(double x)
+#include "mymath.h"
+
+double sqr(double x)
 {
     return x * x;
 }
 
-inline double sqrt(double x)
+double sqrt(double x)
 {
     double epsilon = 0.000001;
     double guess = x / 2.0;
