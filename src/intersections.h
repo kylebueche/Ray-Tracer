@@ -15,6 +15,13 @@ typedef struct
     Vector normal;
 } Plane;
 
+typedef struct
+{
+    Vector point;
+    double radius;
+} Sphere;
+
 double intersectsPlane(Ray, Plane);
+double intersectsSphere(Ray, Sphere);
 
 #endif
