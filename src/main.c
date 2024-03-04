@@ -24,16 +24,18 @@ static HDC frame_device_context;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
+    Sphere sphere = { 0 };
     Plane plane = { 0 };
     Ray ray = { 0 };
-    long int color;
+    long int color = 0;
     double camWidth;
     double camHeight;
     double camDepth;
     double pixelDist;
     double camWidthOffset;
     double camHeightOffset;
-    double planeDist;
+    double closestDist;
+    double contenderDist;
     int x;
     int y;
     static WNDCLASS window_class = { 0 };
@@ -64,18 +66,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     {
         ShowWindow(window_handle, nCmdShow);
 	
-	camDepth = 1.0;
-	camWidth = 1.0;
-	plane.point.x = 0.0;
-	plane.point.y = 0.0;
-	plane.point.z = -10.0;
-	plane.normal.x = 0.0;
-	plane.normal.y = 0.0;
+    	camDepth = 1.0;
+	    camWidth = 1.0;
+    	plane.point.x = 0.0;
+    	plane.point.y = 0.0;
+    	plane.point.z = -10.0;
+    	plane.normal.x = 0.0;
+    	plane.normal.y = 0.0;
         plane.normal.z = 1.0;
-	vecNormalize(&plane.normal);
+    	vecNormalize(&plane.normal);
         ray.point.x = 0.0;
-	ray.point.y = 0.0;
-	ray.point.z = 0.0;
+    	ray.point.y = 0.0;
+    	ray.point.z = 0.0;
+        sphere.point.x = 20.0;
+        sphere.point.y = 0.0;
+        sphere.point.z = 1.0;
+        sphere.radius = 2.0;
 
         while (!quit)
         {
@@ -88,29 +94,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 
             /* This is where we do everything for the game. */
 
-	    pixelDist = camWidth / pixelGrid.width;
-	    camHeight = pixelDist * pixelGrid.height;
-	    camWidthOffset = camWidth / 2.0;
-	    camHeightOffset = camHeight / 2.0;
+	        pixelDist = camWidth / pixelGrid.width;
+	        camHeight = pixelDist * pixelGrid.height;
+	        camWidthOffset = camWidth / 2.0;
+	        camHeightOffset = camHeight / 2.0;
             for (x = 0; x < pixelGrid.width; x++)
             {
                 for (y = 0; y < pixelGrid.height; y++)
                 {
-		    ray.direction.x = camDepth;
-		    ray.direction.y = x * pixelDist - camWidthOffset;
-		    ray.direction.z = y * pixelDist - camHeightOffset;
-		    vecNormalize(&ray.direction);
-		    planeDist = intersectsPlane(ray, plane);
-		    if (planeDist < 0.0)
+		            ray.direction.x = camDepth;
+        		    ray.direction.y = x * pixelDist - camWidthOffset;
+		            ray.direction.z = y * pixelDist - camHeightOffset;
+		            vecNormalize(&ray.direction);
+        		    closestDist = intersectsPlane(ray, plane);
+                    contenderDist = intersectsSphere(ray, sphere);
+                    color = 0x000000ff;
+                    if (contenderDist >= 0.0)
                     {
-                        pixelGrid.pixels[(y * pixelGrid.width + x)] = 0x0000bbff;
+                        color += 0x00ff0000;
                     }
-		    else
-		    {
-			pixelGrid.pixels[(y * pixelGrid.width + x)] = 0x00555555;
-		    }
+                    if (closestDist >= 0.0)
+                    {
+                        color += 0x00009f00;
+		            }
+                    pixelGrid.pixels[(y * pixelGrid.width + x)] = color;
                 }
             }
+            printf("|");
             InvalidateRect(window_handle, NULL, FALSE);
             UpdateWindow(window_handle);
         }

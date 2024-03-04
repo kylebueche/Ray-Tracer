@@ -1,4 +1,5 @@
 #include "mymath.h"
+#include <stdio.h>
 
 double sqr(double x)
 {
@@ -7,11 +8,40 @@ double sqr(double x)
 
 double sqrt(double x)
 {
-    double epsilon = 0.000001;
-    double guess = x / 2.0;
-    while ((guess * guess - x) > epsilon || (x - guess * guess) > epsilon)
+    double L = 0;
+    double R = x;
+    if (x < 0.0)
     {
-        guess = (guess + (x / guess)) / 2.0;
+        return -1.0;
     }
-    return guess;
+    else if (L * L == x)
+    {
+        return L;
+    }
+    else if (R * R == x)
+    {
+        return R;
+    }
+    else
+    {
+        return sqrtHelper(x, R);
+    }
+}
+
+double sqrtHelper(double x, double M)
+{
+    double epsilon = 0.0001; 
+    M = (M + (x / M)) / 2;
+    if (M * M > x + epsilon)
+    {
+        return sqrtHelper(x, M);
+    }
+    else if (M * M < x - epsilon)
+    {
+        return sqrtHelper(x, M);
+    }
+    else
+    {
+        return M;
+    }
 }

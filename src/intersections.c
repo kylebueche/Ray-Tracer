@@ -1,8 +1,56 @@
 #include "intersections.h"
 #include "vectormath.h"
-#include "shapes.h"
+#include "objects.h"
+#include "colors.h"
 
-/** returns the distance which the ray intersects the plane, or -1.0 if parallel. **/
+
+/** returns closest object and its distance, or negative dist if no valid intersections occur **/
+Intersection findClosestObject(Ray ray, ObjectNode *objects)
+{
+    int objectsIntersected = 0;
+    double closest = 0.0;
+    double contender;
+    ObjectNode currentObj = objects;
+    Intersection intersection;
+    intersection.objectPtr = NULL;
+    intersection.distance = -1.0;
+    if (objects != NULL)
+    {
+        intersection.distance = intersectsObject(ray, currentObj->object);
+        intersection.objectPtr = currentObj;
+        while (currentObj != NULL)
+        {
+            contender = intersectsObject(ray, currentObj->object);
+            if (intersection.distance < 0.0 || (contender > 0.0 && contender < intersection.distance))
+            {
+                intersection.distance = contender;
+                intersection.objectPtr = currentObj;
+            }
+            currentObj = currentObj->next;
+        }
+    }
+    return intersection;
+}
+
+intersectsObject(Ray ray, AnyObject object)
+{
+    double distance;
+    switch (object.type)
+    {
+        case 0:
+            distance = intersectsPlane(ray, currentObj->object.plane);
+            break;
+        case 1:
+            distance = intersectsSphere(ray, currentObj->object.sphere);
+            break;
+        default:
+            distance = -1.0;
+            break;
+    }
+    return distance;
+}
+
+/** returns the distance which the ray intersects the plane, or a negative number if it doesn't. **/
 
 double intersectsPlane(Ray ray, Plane plane)
 {
@@ -15,23 +63,30 @@ double intersectsPlane(Ray ray, Plane plane)
     return returnVal;
 }
 
+/** returns the distance which the ray first intersects the plane, or a negative number if it doesn't. **/
+
 double intersectsSphere(Ray ray, Sphere sphere)
 {
-    double intersection1;
-    double intersection2;
     double returnVal = -1.0;
     Vector origin = vecsSub(ray.point, sphere.point);
-    Vector a = vecsMult(ray.direction, ray.direction);
-    Vector b = vecMult(vecsMult(origin, ray.direction), 2);
-    Vector c = vecsMult(origin, origin);
-    double delta = vecsSub(vecsmult(b, b), vecMult(vecsMult(a, c), 4));
-    if (delta == 0)
+    double a = vecDot(ray.direction, ray.direction);
+    double b;
+    double c;
+    double insideSqrt;
+    if (a != 0.0)
     {
-        do this
-    } else if (delta > 0)
-        do this
+        b = 2.0 * vecDot(origin, ray.direction);
+        c = vecDot(origin, origin) - (sphere.radius * sphere.radius);
+        insideSqrt = sqr(b) - (4.0 * a * c);
+        if (insideSqrt >= 0.0)
+        {
+            returnVal = ((0.0 - b) - sqrt(insideSqrt)) / (2.0 * a);
+        }
     }
+    return returnVal;
+}
 
+    
 /*int intersectsTriangle(Ray ray, Triangle triangle)
 {
     int returnVal = 0;

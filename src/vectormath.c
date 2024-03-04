@@ -1,4 +1,6 @@
 #include "vectormath.h"
+#include "mymath.h"
+#include <stdio.h>
 
 void vecAdd(Vector *a, const Vector b)
 {
