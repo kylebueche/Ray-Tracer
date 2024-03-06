@@ -91,7 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
         *lights = newSun(newVector(-0.1, -1.0, 1.0), newColor(1.0, 1.0, 1.0), 1.0);
         /*lights->next = malloc(sizeof(LightNode)); */
         /**(lights->next) = newPointLight(newVector(10.0, 10.0, 0.0), newColor(0.5, 0.9, 0.9), 0.4);*/
-        numberOfReflections = 5;
+        numberOfReflections = 1000;
 
         while (!quit)
         {
