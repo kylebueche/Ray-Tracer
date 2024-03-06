@@ -1,4 +1,4 @@
-main.exe : main.o intersections.o vectormath.o mymath.o
+main.exe : main.o raytracing.o intersections.o objects.o lights.o vectormath.o mymath.o
 	gcc -o ../main.exe main.o raytracing.o intersections.o objects.c lights.c vectormath.o mymath.o -luser32 -lgdi32
 
 main.o : main.c

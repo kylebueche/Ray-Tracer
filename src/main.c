@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "mymath.h"
 #include "vectormath.h"
@@ -27,6 +28,10 @@ static HDC frame_device_context;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
+    Color color;
+    uint32_t color32;
+    time_t currentTime;
+    time_t initialTime;
     Ray ray = { 0 };
     Color skybox = { 0 };
     ObjectNode *objects = NULL;
@@ -73,16 +78,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
         ray.position.x = 0.0;
     	ray.position.y = 0.0;
     	ray.position.z = 0.0;
-        skybox = newColor(0.0, 0.2, 1.0);
+        skybox = newColor(0.56, 1.0, 1.0);
         objects = malloc(sizeof(ObjectNode));
-        *objects = newPlane(newVector(0.0, 0.0, -10.0), newVector(0.0, 0.0, 1.0), newColor(0.0, 0.3, 0.7), 0.5);
+        *objects = newPlane(newVector(0.0, 0.0, -1.0), newVector(0.0, 0.0, 1.0), newColor(1.0, 0.5, 0.5), 0.9);
         objects->next = malloc(sizeof(ObjectNode));
-        *(objects->next) = newSphere(newVector(10.0, 0.0, 0.0), 1.0, newColor(0.0, 6.0, 3.0), 0.5);
+        *(objects->next) = newSphere(newVector(20.0, -5.0, 1.0), 2.0, newColor(1.0, 0.6, 0.6), 0.25);
+        objects->next->next = malloc(sizeof(ObjectNode));
+        *(objects->next->next) = newSphere(newVector(6.0, 1.0, 0.0), 0.5, newColor(1.0, 1.0, 1.0), 1.0);
+        objects->next->next->next = malloc(sizeof(ObjectNode));
+        *(objects->next->next->next) = newSphere(newVector(20.0, 0.0, -1.0), 1.0, newColor(0.0, 0.25, 1.0), 6.0);
         lights = malloc(sizeof(LightNode));
-        *lights = newSun(newVector(-1.0, -1.0, 1.0), newColor(1.0, 1.0, 1.0), 1.0);
-        lights->next = malloc(sizeof(LightNode)); 
-        *(lights->next) = newPointLight(newVector(10.0, 10.0, 0.0), newColor(0.5, 0.9, 0.9), 0.4);
-        numberOfReflections = 2;
+        *lights = newSun(newVector(-0.1, -1.0, 1.0), newColor(1.0, 1.0, 1.0), 1.0);
+        /*lights->next = malloc(sizeof(LightNode)); */
+        /**(lights->next) = newPointLight(newVector(10.0, 10.0, 0.0), newColor(0.5, 0.9, 0.9), 0.4);*/
+        numberOfReflections = 5;
 
         while (!quit)
         {
@@ -99,6 +108,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	        camHeight = pixelDist * pixelGrid.height;
 	        camWidthOffset = camWidth / 2.0;
 	        camHeightOffset = camHeight / 2.0;
+            initialTime = time(NULL);
             for (x = 0; x < pixelGrid.width; x++)
             {
                 for (y = 0; y < pixelGrid.height; y++)
@@ -107,7 +117,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
         		    ray.direction.y = x * pixelDist - camWidthOffset;
 		            ray.direction.z = y * pixelDist - camHeightOffset;
 		            vecNormalize(&ray.direction);
-                    pixelGrid.pixels[(y * pixelGrid.width + x)] = colorTo24Bit(traceRay(ray, objects, lights, skybox, numberOfReflections));
+                    /**lights->light.sun.direction = vecNormal(newVector(lights->light.sun.direction.y, lights->light.sun.direction.z, lights->light.sun.direction.x));*/
+                    color = traceRay(ray, objects, lights, skybox, numberOfReflections);
+                    color32 = colorTo24Bit(color);
+                    /*printf("r: %f, g: %f, b: %f\nHex: %x\n", color.r, color.g, color.b, color32);*/
+                    pixelGrid.pixels[(y * pixelGrid.width + x)] = color32;
                 }
             }
             printf("|");

@@ -15,10 +15,14 @@ Color clampColor(Color color)
 uint32_t colorTo24Bit(Color color)
 {
     uint32_t output = 0;
+    int r, g, b;
     color = clampColor(color);
-    output += (uint32_t) color.r * 0x00ff0000;
-    output += (uint32_t) color.g * 0x0000ff00;
-    output += (uint32_t) color.b * 0x000000ff;
+    r = (int) (color.r * 255);
+    g = (int) (color.g * 255);
+    b = (int) (color.b * 255);
+    output += (uint32_t) r * 0x00010000;
+    output += (uint32_t) g * 0x00000100;
+    output += (uint32_t) b * 0x00000001;
     return output;
 }
 

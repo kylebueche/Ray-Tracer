@@ -1,4 +1,5 @@
 #include "raytracing.h"
+#include <stdio.h>
 
 Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Color skybox, int numberOfReflections)
 {
@@ -34,7 +35,7 @@ Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Colo
     }
     else
     {
-        return newColor(0.0, 0.5, 0.0);
+        return newColor(0.0, 0.0, 0.0);
     }
 }
 
