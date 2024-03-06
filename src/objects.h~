@@ -4,12 +4,6 @@
 #include "vectormath.h"
 #include "lights.h"
 
-typedef enum
-{
-    PLANE,
-    SPHERE
-} ObjectType;
-
 typedef struct
 {
     Vector point;
@@ -33,7 +27,7 @@ typedef union
 typedef struct
 {
     Object object;
-    ObjectType type;
+    int type; /** 0 = plane, 1 = sphere **/
     ObjectNode *next;
 } ObjectNode;
 

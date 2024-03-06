@@ -8,7 +8,6 @@ ObjectNode newPlane(Vector point, Vector normal, Color color, int roughness)
     object.plane.normal = normal;
     vecNormalize(&object.plane.normal);
     object.plane.color = color;
-    object.plane.roughness = clamp(roughness);
     object.next = NULL;
     return object;
 }
@@ -20,7 +19,15 @@ ObjectNode newSphere(Vector point, double radius, Color color, int roughness)
     object.sphere.radius = radius;
     object.sphere.point = point;
     object.sphere.color = color;
-    object.sphere.roughness = clamp(roughness); 
+    if (roughness > 1.0)
+    {
+        roughness = 1.0;
+    }
+    else if (roughness < 0.0)
+    {
+        roughness = 0.0;
+    }
+    object.sphere.roughness = roughness; 
     object.next = NULL;
     return object;
 }

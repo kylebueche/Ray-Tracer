@@ -6,11 +6,6 @@ double clamp(double value)
     return lowClamp > 1.0 ? 1.0 : lowClamp;
 }
 
-Color clampColor(Color color)
-{
-    return newColor(clamp(color.r), clamp(color.g), clamp(color.b));
-}
-
 Color sumOfLambertions(Color objectColor, Ray normalRay, LightNode *lights, ObjectNode *objects)
 {
     Color incomingColor = newColor(0.0, 0.0, 0.0);
@@ -21,15 +16,16 @@ Color sumOfLambertions(Color objectColor, Ray normalRay, LightNode *lights, Obje
     {
         switch (lights->light.type)
         {
-            case SUN:
+            case 0:
                 rayToLight.direction = lights->light.sun.direction;
+                lightDistance = 0.0;
                 closest = findClosestObject(rayToLight, objects);
                 if (closest.distance <= 0.0);
                 {
                     incomingColor = colorSum(incomingColor, colorMult(colorFromLight(light), vecDot(rayToLight.direction, normalRay.direction)));
                 }
                 break;
-            case POINTLIGHT:
+            case 1:
                 rayToLight.direction = vecsSub(lights->light.pointLight.position, normalRay.point);
                 lightDistance = vecLen(rayToLight.direction);
                 vecNormalize(&rayToLight.Direction);

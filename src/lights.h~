@@ -50,6 +50,5 @@ Color colorSum(Color, Color);
 Color colorProd(Color, Color);
 Color colorMult(Color, double);
 Color colorFromLight(LightNode, double);
-double clamp(double);
 
 #endif
