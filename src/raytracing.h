@@ -4,8 +4,10 @@
 #include "vectormath.h"
 #include "lights.h"
 #include "objects.h"
+#include "intersections.h"
 
-Color traceRay(Ray ray, ObjectNode *objects, LightNode *lights, Color skybox, int numberOfReflections)
+Color traceRay(const Ray, ObjectNode *, LightNode *, const Color, int);
+Color sumOfLambertians(Ray, LightNode *, ObjectNode *);
 Ray reflection(Ray, Ray);
 
 #endif

@@ -1,56 +1,55 @@
+#include <stdint.h>
 #include "lights.h"
 
 double clamp(double value)
 {
-    const double lowClamp = value < 0.0 ? 0.0 : value;
-    return lowClamp > 1.0 ? 1.0 : lowClamp;
+    double lowClamp = (value < 0.0) ? 0.0 : value;
+    return (lowClamp > 1.0) ? 1.0 : lowClamp;
 }
 
 Color clampColor(Color color)
 {
-    return newColor(clamp(color.r), clamp(color.g), clamp(color.b));
+    return newColor(color.r, color.g, color.b);
 }
 
-Color sumOfLambertions(Color objectColor, Ray normalRay, LightNode *lights, ObjectNode *objects)
+uint32_t colorTo24Bit(Color color)
 {
-    Color incomingColor = newColor(0.0, 0.0, 0.0);
-    Intersection closest;
-    Ray rayToLight;
-    rayToLight.position = normalRay.point;
-    while (lights != NULL)
-    {
-        switch (lights->light.type)
-        {
-            case SUN:
-                rayToLight.direction = lights->light.sun.direction;
-                closest = findClosestObject(rayToLight, objects);
-                if (closest.distance <= 0.0);
-                {
-                    incomingColor = colorSum(incomingColor, colorMult(colorFromLight(light), vecDot(rayToLight.direction, normalRay.direction)));
-                }
-                break;
-            case POINTLIGHT:
-                rayToLight.direction = vecsSub(lights->light.pointLight.position, normalRay.point);
-                lightDistance = vecLen(rayToLight.direction);
-                vecNormalize(&rayToLight.Direction);
-                closest = findClosestObject(rayToLight, objects);
-                if (closest.distance <= 0.0 || closest.distance > lightDistance);
-                {
-                    incomingColor = colorSum(incomingColor, colorMult(colorFromLight(light), vecDot(rayToLight.direction, normalRay.direction)));
-                }
-                break;
-        }
-        lights = lights->next;
-    }
-    return incomingColor;
+    uint32_t output = 0;
+    color = clampColor(color);
+    output += (uint32_t) color.r * 0x00ff0000;
+    output += (uint32_t) color.g * 0x0000ff00;
+    output += (uint32_t) color.b * 0x000000ff;
+    return output;
+}
+
+LightNode newSun(Vector direction, Color color, double intensity)
+{
+    LightNode lightNode;
+    lightNode.type = SUN;
+    lightNode.light.sun.direction = vecNormal(direction);
+    lightNode.light.sun.color = color;
+    lightNode.light.sun.intensity = intensity;
+    lightNode.next = NULL;
+    return lightNode;
+}
+
+LightNode newPointLight(Vector position, Color color, double intensity)
+{
+    LightNode lightNode;
+    lightNode.type = POINTLIGHT;
+    lightNode.light.pointLight.position = position;
+    lightNode.light.pointLight.color = color;
+    lightNode.light.pointLight.intensity = intensity;
+    lightNode.next = NULL;
+    return lightNode;
 }
 
 Color newColor(double r, double g, double b)
 {
     Color color;
-    color.r = r;
-    color.g = g;
-    color.b = b;
+    color.r = clamp(r);
+    color.g = clamp(g);
+    color.b = clamp(b);
     return color;
 }
 
@@ -83,25 +82,33 @@ Color colorMult(Color color, double multiplier)
     return color;
 }
 
-colorFromLight(LightNode *lightPtr, double multiplier)
+double lightIntensity(LightNode *lightPtr)
 {
-    Color color;
-    double intensity;
     switch (lightPtr->type)
     {
-        case 0:
-            color = colorCopy(lightPtr->light.sun.color);
-            intensity = lightPtr->light.sun.intensity;
-            break;
-        case 1:
-            color = colorCopy(lightPtr->light.pointLight.color);
-            intensity = lightPtr->light.pointLight.intensity;
-            break;
+        case SUN:
+            return lightPtr->light.sun.intensity;
+        case POINTLIGHT:
+            return lightPtr->light.pointLight.intensity;
         default:
-            color = newColor(0.0, 0.0, 0.0);
-            intensity = 0.0;
-            break;
+            return 0.0;
     }
-    color = colorMult(color, (intensity * multiplier));
-    return color;
+}
+
+Color lightColor(LightNode *lightPtr)
+{
+    switch (lightPtr->type)
+    {
+        case SUN:
+            return lightPtr->light.sun.color;
+        case POINTLIGHT:
+            return lightPtr->light.pointLight.color;
+        default:
+            return newColor(0.0, 0.0, 0.0);
+    }
+}
+
+Color colorFromLight(LightNode *lightPtr)
+{
+    return colorMult(lightColor(lightPtr), lightIntensity(lightPtr));
 }

@@ -2,6 +2,15 @@
 #include "mymath.h"
 #include <stdio.h>
 
+Vector newVector(double x, double y, double z)
+{
+    Vector v;
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+
 void vecAdd(Vector *a, const Vector b)
 {
     a->x += b.x;
@@ -16,18 +25,20 @@ void vecSub(Vector *a, const Vector b)
     a->z -= b.z;
 }
 
-void vecMult(Vector *a, double b)
+Vector vecMult(Vector a, double b)
 {
-    a->x *= b;
-    a->y *= b;
-    a->z *= b;
+    a.x *= b;
+    a.y *= b;
+    a.z *= b;
+    return a;
 }
 
-void vecDiv(Vector *a, double b)
+Vector vecDiv(Vector a, double b)
 {
-    a->x /= b;
-    a->y /= b;
-    a->z /= b;
+    a.x /= b;
+    a.y /= b;
+    a.z /= b;
+    return a;
 }
 
 Vector vecNeg(Vector a)
@@ -83,8 +94,13 @@ double vecLen(const Vector a)
 double vecNormalize(Vector *a)
 {
     double b = vecLen(*a);
-    vecDiv(a, b);
+    *a = vecDiv(*a, b);
     return b;
+}
+
+Vector vecNormal(Vector a)
+{
+    return vecDiv(a, vecLen(a));
 }
 
 double vecDot(const Vector a, const Vector b)

@@ -5,7 +5,10 @@
 
 #include "mymath.h"
 #include "vectormath.h"
+#include "objects.h"
+#include "lights.h"
 #include "intersections.h"
+#include "raytracing.h"
 
 struct
 {
@@ -24,18 +27,17 @@ static HDC frame_device_context;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
-    Sphere sphere = { 0 };
-    Plane plane = { 0 };
     Ray ray = { 0 };
-    long int color = 0;
+    Color skybox = { 0 };
+    ObjectNode *objects = NULL;
+    LightNode *lights = NULL;
     double camWidth;
     double camHeight;
     double camDepth;
     double pixelDist;
     double camWidthOffset;
     double camHeightOffset;
-    double closestDist;
-    double contenderDist;
+    int numberOfReflections;
     int x;
     int y;
     static WNDCLASS window_class = { 0 };
@@ -68,20 +70,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	
     	camDepth = 1.0;
 	    camWidth = 1.0;
-    	plane.point.x = 0.0;
-    	plane.point.y = 0.0;
-    	plane.point.z = -10.0;
-    	plane.normal.x = 0.0;
-    	plane.normal.y = 0.0;
-        plane.normal.z = 1.0;
-    	vecNormalize(&plane.normal);
-        ray.point.x = 0.0;
-    	ray.point.y = 0.0;
-    	ray.point.z = 0.0;
-        sphere.point.x = 20.0;
-        sphere.point.y = 0.0;
-        sphere.point.z = 1.0;
-        sphere.radius = 2.0;
+        ray.position.x = 0.0;
+    	ray.position.y = 0.0;
+    	ray.position.z = 0.0;
+        skybox = newColor(0.0, 0.2, 1.0);
+        objects = malloc(sizeof(ObjectNode));
+        *objects = newPlane(newVector(0.0, 0.0, -10.0), newVector(0.0, 0.0, 1.0), newColor(0.0, 0.3, 0.7), 0.5);
+        objects->next = malloc(sizeof(ObjectNode));
+        *(objects->next) = newSphere(newVector(10.0, 0.0, 0.0), 1.0, newColor(0.0, 6.0, 3.0), 0.5);
+        lights = malloc(sizeof(LightNode));
+        *lights = newSun(newVector(-1.0, -1.0, 1.0), newColor(1.0, 1.0, 1.0), 1.0);
+        lights->next = malloc(sizeof(LightNode)); 
+        *(lights->next) = newPointLight(newVector(10.0, 10.0, 0.0), newColor(0.5, 0.9, 0.9), 0.4);
+        numberOfReflections = 2;
 
         while (!quit)
         {
@@ -106,18 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
         		    ray.direction.y = x * pixelDist - camWidthOffset;
 		            ray.direction.z = y * pixelDist - camHeightOffset;
 		            vecNormalize(&ray.direction);
-        		    closestDist = intersectsPlane(ray, plane);
-                    contenderDist = intersectsSphere(ray, sphere);
-                    color = 0x000000ff;
-                    if (contenderDist >= 0.0)
-                    {
-                        color += 0x00ff0000;
-                    }
-                    if (closestDist >= 0.0)
-                    {
-                        color += 0x00009f00;
-		            }
-                    pixelGrid.pixels[(y * pixelGrid.width + x)] = color;
+                    pixelGrid.pixels[(y * pixelGrid.width + x)] = colorTo24Bit(traceRay(ray, objects, lights, skybox, numberOfReflections));
                 }
             }
             printf("|");
@@ -125,7 +115,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
             UpdateWindow(window_handle);
         }
     }
-
     return 0;
 }
 

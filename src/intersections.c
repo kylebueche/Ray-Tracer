@@ -1,26 +1,24 @@
 #include "intersections.h"
 #include "vectormath.h"
 #include "objects.h"
-#include "colors.h"
+#include "lights.h"
 
 
 /** returns closest object and its distance, or negative dist if no valid intersections occur **/
 Intersection findClosestObject(Ray ray, ObjectNode *objects)
 {
-    int objectsIntersected = 0;
-    double closest = 0.0;
     double contender;
-    ObjectNode currentObj = objects;
+    ObjectNode *currentObj = objects;
     Intersection intersection;
     intersection.objectPtr = NULL;
     intersection.distance = -1.0;
     if (objects != NULL)
     {
-        intersection.distance = intersectsObject(ray, currentObj->object);
+        intersection.distance = intersectsObject(ray, currentObj);
         intersection.objectPtr = currentObj;
         while (currentObj != NULL)
         {
-            contender = intersectsObject(ray, currentObj->object);
+            contender = intersectsObject(ray, currentObj);
             if (intersection.distance < 0.0 || (contender > 0.0 && contender < intersection.distance))
             {
                 intersection.distance = contender;
@@ -32,22 +30,17 @@ Intersection findClosestObject(Ray ray, ObjectNode *objects)
     return intersection;
 }
 
-intersectsObject(Ray ray, AnyObject object)
+double intersectsObject(Ray ray, ObjectNode *objectPtr)
 {
-    double distance;
-    switch (object.type)
+    switch (objectPtr->type)
     {
-        case 0:
-            distance = intersectsPlane(ray, currentObj->object.plane);
-            break;
-        case 1:
-            distance = intersectsSphere(ray, currentObj->object.sphere);
-            break;
+        case PLANE:
+            return intersectsPlane(ray, objectPtr->object.plane);
+        case SPHERE:
+            return intersectsSphere(ray, objectPtr->object.sphere);
         default:
-            distance = -1.0;
-            break;
+            return -1.0;
     }
-    return distance;
 }
 
 /** returns the distance which the ray intersects the plane, or a negative number if it doesn't. **/
@@ -58,7 +51,7 @@ double intersectsPlane(Ray ray, Plane plane)
     double x = vecDot(ray.direction, plane.normal);
     if (x != 0.0)
     {
-        returnVal = (vecDot(plane.point, plane.normal) - vecDot(ray.point, plane.normal)) / x;
+        returnVal = (vecDot(plane.position, plane.normal) - vecDot(ray.position, plane.normal)) / x;
     }
     return returnVal;
 }
@@ -68,7 +61,7 @@ double intersectsPlane(Ray ray, Plane plane)
 double intersectsSphere(Ray ray, Sphere sphere)
 {
     double returnVal = -1.0;
-    Vector origin = vecsSub(ray.point, sphere.point);
+    Vector origin = vecsSub(ray.position, sphere.position);
     double a = vecDot(ray.direction, ray.direction);
     double b;
     double c;
