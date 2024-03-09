@@ -1,0 +1,13 @@
+#ifndef OBJECTLOADING_H
+#define OBJECTLOADING_H
+
+#include "objects.h"
+#include "lights.h"
+#include <stdlib.h>
+
+ObjectNode * loadObject(ObjectNode *, ObjectNode);
+void unloadObjects(ObjectNode *);
+LightNode * loadLight(LightNode *, LightNode);
+void unloadLights(LightNode *);
+
+#endif
