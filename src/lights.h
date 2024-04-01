@@ -58,4 +58,5 @@ double lightIntensity(LightNode *);
 Color clampColor(Color);
 double clamp(double);
 uint32_t colorTo24Bit(Color);
+Color colorFrom24Bit(uint32_t);
 #endif

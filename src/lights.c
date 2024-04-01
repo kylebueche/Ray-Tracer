@@ -26,6 +26,18 @@ uint32_t colorTo24Bit(Color color)
     return output;
 }
 
+Color colorFrom24Bit(uint32_t color32)
+{
+    Color output = newColor(0, 0, 0);
+    int r = color32 >> 16;
+    int g = (color32 >> 8) - (r << 8);
+    int b = color32 - (r << 16) - (g << 8);
+    output.r = r / 256.0;
+    output.g = g / 256.0;
+    output.b = b / 256.0;
+    return output;
+}
+
 LightNode newSun(Vector direction, Color color, double intensity)
 {
     LightNode lightNode;

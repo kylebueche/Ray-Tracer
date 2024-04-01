@@ -7,6 +7,7 @@
 /** returns closest object and its distance, or negative dist if no valid intersections occur **/
 Intersection findClosestObject(Ray ray, ObjectNode *objects)
 {
+    double epsilon = 0.00000;
     double contender;
     ObjectNode *currentObj = objects;
     Intersection intersection;
@@ -19,7 +20,7 @@ Intersection findClosestObject(Ray ray, ObjectNode *objects)
         while (currentObj != NULL)
         {
             contender = intersectsObject(ray, currentObj);
-            if (intersection.distance < 0.0 || (contender > 0.0 && contender < intersection.distance))
+            if (intersection.distance < epsilon || (contender > epsilon && contender < intersection.distance))
             {
                 intersection.distance = contender;
                 intersection.objectPtr = currentObj;

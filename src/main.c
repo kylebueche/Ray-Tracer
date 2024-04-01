@@ -11,28 +11,26 @@
 #include "objectloading.h"
 #include "intersections.h"
 #include "raytracing.h"
+#include "antialiasing.h"
 
 struct
 {
     int width;
     int height;
     uint32_t *pixels;
-} pixelGrid = {0};
-
-LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM wParam, LPARAM lParam);
+} pixelGrid = { 0 };
 
 static bool quit = false;
-
 static BITMAPINFO frame_bitmap_info;
 static HBITMAP frame_bitmap = 0;
 static HDC frame_device_context;
+
+LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
     Color color;
     uint32_t color32;
-    time_t currentTime;
-    time_t initialTime;
     Ray ray = { 0 };
     Color skybox = { 0 };
     ObjectNode *objects = NULL;
@@ -44,8 +42,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     double camWidthOffset;
     double camHeightOffset;
     int numberOfReflections;
-    int x;
-    int y;
+    int x, y, i, j;
+    int samplesx, samplesy;
     static WNDCLASS window_class = { 0 };
     static const wchar_t window_class_name[] = L"My Window Class";
     HWND window_handle;
@@ -73,26 +71,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     else
     {
         ShowWindow(window_handle, nCmdShow);
-	
+	    samplesx = 5;
+        samplesy = 5;
     	camDepth = 1.0;
 	    camWidth = 1.0;
         ray.position.x = 0.0;
     	ray.position.y = 0.0;
     	ray.position.z = 0.0;
-        skybox = colorMult(newColor(0.56, 1.0, 1.0), 0.1);
+        skybox = colorMult(newColor(0.56, 1.0, 1.0), 1.0);
         loadObject(&objects, newPlane(newVector(0.0, 0.0, -1.0),
                                          newVector(0.0, 0.0, 1.0),
-                                         newColor(1.0, 1.0, 1.0), 0.8));
-        loadObject(&objects, newSphere(newVector(20.0, -5.0, 1.0), 2.0,
-                                          newColor(1.0, 0.6, 0.6), 0.5));
-        loadObject(&objects, newSphere(newVector(6.0, 1.0, 0.0), 0.5,
-                                          newColor(1.0, 1.0, 1.0), 1.0));
+                                         newColor(1.0, 1.0, 1.0), 1.0));
+        loadObject(&objects, newSphere(newVector(20.0, -6.0, 1.0), 2.0,
+                                          newColor(1.0, 0.8, 0.8), 0.1));
+        loadObject(&objects, newSphere(newVector(6.0, 1.0, -0.1), 0.5,
+                                          newColor(1.0, 0.5, 0.4), 0.5));
         loadObject(&objects, newSphere(newVector(20.0, 0.0, -1.0), 1.0,
-                                          newColor(0.0, 0.25, 1.0), 6.0));
+                                          newColor(0.0, 0.25, 1.0), 1.0));
         loadLight(&lights, newSun(newVector(-0.1, -1.0, 1.0),
-                                       newColor(1.0, 1.0, 1.0), 0.0));
-        loadLight(&lights, newPointLight(newVector(6.0, 1.8, 10.0),
-                                            newColor(1.0, 1.0, 1.0), 1.0));
+                                       newColor(1.0, 1.0, 1.0), 1.0));
+        /*loadLight(&lights, newPointLight(newVector(3.0, 1.8, 10.0),
+                                            newColor(1.0, 1.0, 1.0), 0.0));*/
         numberOfReflections = 5;
 
         while (!quit)
@@ -110,19 +109,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	        camHeight = pixelDist * pixelGrid.height;
 	        camWidthOffset = camWidth / 2.0;
 	        camHeightOffset = camHeight / 2.0;
-            initialTime = time(NULL);
             for (x = 0; x < pixelGrid.width; x++)
             {
                 for (y = 0; y < pixelGrid.height; y++)
                 {
-		            ray.direction.x = camDepth;
-        		    ray.direction.y = x * pixelDist - camWidthOffset;
-		            ray.direction.z = y * pixelDist - camHeightOffset;
-		            vecNormalize(&ray.direction);
-                    /**lights->light.sun.direction = vecNormal(newVector(lights->light.sun.direction.y, lights->light.sun.direction.z, lights->light.sun.direction.x));*/
-                    color = traceRay(ray, objects, lights, skybox, numberOfReflections);
+                    color = newColor(0.0, 0.0, 0.0);
+                    for (i = 1; i <= samplesx; i++)
+                    {
+                        for (j = 1; j <= samplesy; j++)
+                        {
+		                    ray.direction.x = camDepth;
+                            ray.direction.y = x * pixelDist - camWidthOffset - (pixelDist / 2.0) + (pixelDist * i / samplesx);
+                            ray.direction.z = y * pixelDist - camHeightOffset - (pixelDist / 2.0) + (pixelDist * j / samplesy);
+                            vecNormalize(&ray.direction);
+                            color = colorSum(color, traceRay(ray, objects, lights, skybox, numberOfReflections));
+                        }
+                    }
+                    color = colorMult(color, (1.0 / (samplesx * samplesy)));
+                    /*if (x > 0 && y > 0)
+                    {
+                        color = antialiasPixel(color, colorFrom24Bit(pixelGrid.pixels[y * pixelGrid.width + x - 1]), colorFrom24Bit(pixelGrid.pixels[(y - 1) * pixelGrid.width + x]));
+                    }*/
                     color32 = colorTo24Bit(color);
-                    /*printf("r: %f, g: %f, b: %f\nHex: %x\n", color.r, color.g, color.b, color32);*/
                     pixelGrid.pixels[(y * pixelGrid.width + x)] = color32;
                 }
             }

@@ -15,6 +15,7 @@ Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Colo
         {
             normalRay.position = vecsAdd(ray.position, vecMult(ray.direction, intersection.distance));
             normalRay.direction = objectNormal(intersection.objectPtr, normalRay.position);
+            normalRay.position = vecsAdd(normalRay.position, vecMult(normalRay.direction, 0.0001));
             color = objectColor(intersection.objectPtr);
             roughness = objectRoughness(intersection.objectPtr);
             outputColor = colorProd(color, colorSum(colorMult(sumOfLambertians(normalRay, lights, objects), roughness),

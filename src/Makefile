@@ -1,8 +1,11 @@
-main.exe : main.o raytracing.o intersections.o objectloading.o objects.o lights.o vectormath.o mymath.o
-	gcc -o ../main.exe main.o raytracing.o intersections.o objectloading.o objects.o lights.o vectormath.o mymath.o -luser32 -lgdi32
+main.exe : main.o antialiasing.o raytracing.o intersections.o objectloading.o objects.o lights.o vectormath.o mymath.o
+	gcc -o ../main.exe main.o antialiasing.o raytracing.o intersections.o objectloading.o objects.o lights.o vectormath.o mymath.o -luser32 -lgdi32
 
 main.o : main.c
 	gcc -ansi -pedantic-errors -Wall -c main.c
+
+antialiasing.o : antialiasing.c
+	gcc -ansi -pedantic-errors -Wall -c antialiasing.c
 
 raytracing.o : raytracing.c
 	gcc -ansi -pedantic-errors -Wall -c raytracing.c
