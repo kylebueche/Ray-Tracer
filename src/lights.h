@@ -23,6 +23,7 @@ typedef struct pointLight
     Color color;
     double intensity;
     Vector position;
+    double radius;
 } PointLight;
 
 typedef struct sun
@@ -46,7 +47,7 @@ typedef struct lightNode
 } LightNode;
 
 LightNode newSun(Vector, Color, double);
-LightNode newPointLight(Vector, Color, double);
+LightNode newPointLight(Vector, Color, double, double);
 Color newColor(double, double, double);
 Color copyColor(Color);
 Color colorSum(Color, Color);

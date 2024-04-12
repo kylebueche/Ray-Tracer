@@ -8,40 +8,15 @@ double sqr(double x)
 
 double sqrt(double x)
 {
-    double L = 0;
-    double R = x;
+    double sqrt = x;
+    double epsilon = 0.000001;
     if (x < 0.0)
     {
         return -1.0;
     }
-    else if (L * L == x)
+    while (sqrt * sqrt > x + epsilon || sqrt * sqrt < x - epsilon)
     {
-        return L;
+        sqrt = (sqrt + (x / sqrt)) / 2;
     }
-    else if (R * R == x)
-    {
-        return R;
-    }
-    else
-    {
-        return sqrtHelper(x, R);
-    }
-}
-
-double sqrtHelper(double x, double M)
-{
-    double epsilon = 0.000001; 
-    M = (M + (x / M)) / 2;
-    if (M * M > x + epsilon)
-    {
-        return sqrtHelper(x, M);
-    }
-    else if (M * M < x - epsilon)
-    {
-        return sqrtHelper(x, M);
-    }
-    else
-    {
-        return M;
-    }
+    return sqrt;
 }

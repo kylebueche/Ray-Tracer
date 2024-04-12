@@ -49,13 +49,14 @@ LightNode newSun(Vector direction, Color color, double intensity)
     return lightNode;
 }
 
-LightNode newPointLight(Vector position, Color color, double intensity)
+LightNode newPointLight(Vector position, Color color, double intensity, double radius)
 {
     LightNode lightNode;
     lightNode.type = POINTLIGHT;
     lightNode.light.pointLight.position = position;
     lightNode.light.pointLight.color = color;
     lightNode.light.pointLight.intensity = intensity;
+    lightNode.light.pointLight.radius = radius;
     lightNode.next = NULL;
     return lightNode;
 }

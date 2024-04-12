@@ -2,7 +2,7 @@
 #include "mymath.h"
 #include <stdio.h>
 
-Vector newVector(double x, double y, double z)
+Vector newVector(const double x, const double y, const double z)
 {
     Vector v;
     v.x = x;
@@ -25,7 +25,7 @@ void vecSub(Vector *a, const Vector b)
     a->z -= b.z;
 }
 
-Vector vecMult(Vector a, double b)
+Vector vecMult(Vector a, const double b)
 {
     a.x *= b;
     a.y *= b;
@@ -33,7 +33,7 @@ Vector vecMult(Vector a, double b)
     return a;
 }
 
-Vector vecDiv(Vector a, double b)
+Vector vecDiv(Vector a, const double b)
 {
     a.x /= b;
     a.y /= b;

@@ -1,5 +1,6 @@
 #include "raytracing.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Color skybox, int numberOfReflections)
 {
@@ -44,6 +45,8 @@ Color sumOfLambertians(Ray normalRay, LightNode *lights, ObjectNode *objects)
 {
     Color incomingColor = newColor(0.0, 0.0, 0.0);
     Intersection closest;
+    Vector pointLightSample;
+    int x;
     double lightDistance;
     Ray rayToLight;
     rayToLight.position = normalRay.position;
@@ -60,13 +63,17 @@ Color sumOfLambertians(Ray normalRay, LightNode *lights, ObjectNode *objects)
                 }
                 break;
             case POINTLIGHT:
-                rayToLight.direction = vecsSub(lights->light.pointLight.position, rayToLight.position);
-                lightDistance = vecLen(rayToLight.direction);
-                vecNormalize(&rayToLight.direction);
-                closest = findClosestObject(rayToLight, objects);
-                if (closest.distance <= 0.0 || closest.distance > lightDistance)
+                for (x = 0; x < 1; x++)
                 {
-                    incomingColor = colorSum(incomingColor, colorMult(colorFromLight(lights), vecDot(rayToLight.direction, normalRay.direction)));
+                    pointLightSample = vecMult(vecNormal(newVector((double) rand(), (double) rand(), (double) rand())), lights->light.pointLight.radius);
+                    rayToLight.direction = vecsSub(vecsAdd(lights->light.pointLight.position, pointLightSample), rayToLight.position);
+                    lightDistance = vecLen(rayToLight.direction);
+                    vecNormalize(&rayToLight.direction);
+                    closest = findClosestObject(rayToLight, objects);
+                    if (closest.distance <= 0.0 || closest.distance > lightDistance)
+                    {
+                        incomingColor = colorSum(incomingColor, colorMult(colorFromLight(lights), vecDot(rayToLight.direction, normalRay.direction) / 1));
+                    }
                 }
                 break;
         }
