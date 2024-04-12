@@ -1,13 +1,15 @@
 #ifndef VECTORMATH_H
 #define VECTORMATH_H
 
+#include "vectormath.h"
 #include "mymath.h"
+#include <stdio.h>
 
 typedef struct vector
 {
     double x, y, z;
 } Vector;
-
+/*
 void vecAdd(Vector *a, const Vector b);
 void vecSub(Vector *a, const Vector b);
 Vector vecMult(Vector a, double b);
@@ -24,8 +26,8 @@ Vector vecNormal(Vector a);
 double vecDot(const Vector a, const Vector);
 Vector vecCross(const Vector a, const Vector);
 Vector newVector(const double x, const double y, const double z);
-
-inline extern Vector newVector(const double x, const double y, const double z)
+*/
+static inline Vector newVector(const double x, const double y, const double z)
 {
     Vector v;
     v.x = x;
@@ -34,21 +36,21 @@ inline extern Vector newVector(const double x, const double y, const double z)
     return v;
 }
 
-inline extern void vecAdd(Vector *a, const Vector b)
+static inline void vecAdd(Vector *a, const Vector b)
 {
     a->x += b.x;
     a->y += b.y;
     a->z += b.z;
 }
 
-inline extern void vecSub(Vector *a, const Vector b)
+static inline void vecSub(Vector *a, const Vector b)
 {
     a->x -= b.x;
     a->y -= b.y;
     a->z -= b.z;
 }
 
-inline extern Vector vecMult(Vector a, const double b)
+static inline Vector vecMult(Vector a, const double b)
 {
     a.x *= b;
     a.y *= b;
@@ -56,7 +58,7 @@ inline extern Vector vecMult(Vector a, const double b)
     return a;
 }
 
-inline extern Vector vecDiv(Vector a, const double b)
+static inline Vector vecDiv(Vector a, const double b)
 {
     a.x /= b;
     a.y /= b;
@@ -64,7 +66,7 @@ inline extern Vector vecDiv(Vector a, const double b)
     return a;
 }
 
-inline extern Vector vecNeg(Vector a)
+static inline Vector vecNeg(Vector a)
 {
     a.x *= -1.0;
     a.y *= -1.0;
@@ -72,67 +74,61 @@ inline extern Vector vecNeg(Vector a)
     return a;
 }
 
-inline extern Vector vecsAdd(Vector a, const Vector b)
+static inline Vector vecsAdd(Vector a, const Vector b)
 {
     a.x += b.x;
     a.y += b.y;
     a.z += b.z;
-}
-
-inline extern void vecSub(Vector *a, const Vector b)
-{
-    a->x -= b.x;
-    a->y -= b.y;
-    a->z -= b.z;
-}
-
-inline extern Vector vecMult(Vector a, const double b)
-{
-    a.x *= b;
-    a.y *= b;
-    a.z *= b;
     return a;
 }
 
-inline extern Vector vecDiv(Vector a, const double b)
+static inline Vector vecsSub(Vector a, const Vector b)
 {
-    a.x /= b;
-    a.y /= b;
-    a.z /= b;
+    a.x -= b.x;
+    a.y -= b.y;
+    a.z -= b.z;
     return a;
 }
 
-inline extern Vector vecNeg(Vector a)
+static inline Vector vecsMult(Vector a, const Vector b)
 {
-    a.x *= -1.0;
-    a.y *= -1.0;
-    a.z *= -1.0;
+    a.x *= b.x;
+    a.y *= b.y;
+    a.z *= b.z;
     return a;
 }
 
-inline extern double vecLenSqr(const Vector a)
+static inline Vector vecsDiv(Vector a, const Vector b)
+{
+    a.x /= b.x;
+    a.y /= b.y;
+    a.z /= b.z;
+    return a;
+}
+
+static inline double vecLenSqr(const Vector a)
 {
     return sqr(a.x) + sqr(a.y) + sqr(a.z);
 }
 
-inline extern double vecLen(const Vector a)
+static inline double vecLen(const Vector a)
 {
     return sqrt(vecLenSqr(a));
 }
 
-inline extern double vecNormalize(Vector *a)
+static inline double vecNormalize(Vector *a)
 {
     double b = vecLen(*a);
     *a = vecDiv(*a, b);
     return b;
 }
 
-inline extern Vector vecNormal(Vector a)
+static inline Vector vecNormal(Vector a)
 {
     return vecDiv(a, vecLen(a));
 }
 
-inline extern double vecDot(const Vector a, const Vector b)
+static inline double vecDot(const Vector a, const Vector b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }

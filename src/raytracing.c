@@ -72,7 +72,7 @@ Color sumOfLambertians(Ray normalRay, LightNode *lights, ObjectNode *objects)
                     closest = findClosestObject(rayToLight, objects);
                     if (closest.distance <= 0.0 || closest.distance > lightDistance)
                     {
-                        incomingColor = colorSum(incomingColor, colorMult(colorFromLight(lights), vecDot(rayToLight.direction, normalRay.direction) / 1));
+                        incomingColor = colorSum(incomingColor, colorMult(colorFromLight(lights), vecDot(rayToLight.direction, normalRay.direction) / 1.0));
                     }
                 }
                 break;
