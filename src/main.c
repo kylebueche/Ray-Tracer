@@ -44,6 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     int numberOfReflections;
     int x, y, i, j;
     int samplesx, samplesy;
+    int chunkx, chunky, chunkSize;
     static WNDCLASS window_class = { 0 };
     static const wchar_t window_class_name[] = L"My Window Class";
     HWND window_handle;
@@ -88,7 +89,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
                                           newColor(1.0, 0.5, 0.4), 0.5));
         loadObject(&objects, newSphere(newVector(20.0, 0.0, -1.0), 1.0,
                                           newColor(0.0, 0.25, 1.0), 1.0));
-        loadLight(&lights, newPointLight(newVector(-0.1, -1.0, 1.0),
+        loadLight(&lights, newPointLight(newVector(-0.1, -1.0, 10.0),
                                        newColor(1.0, 1.0, 1.0), 1.0, 1.0));
         /*loadLight(&lights, newPointLight(newVector(3.0, 1.8, 10.0),
                                             newColor(1.0, 1.0, 1.0), 0.0));*/
@@ -126,11 +127,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
                         }
                     }
                     color = colorMult(color, (1.0 / (samplesx * samplesy)));
-                    /*if (x > 0 && y > 0)
-                    {
-                        color = antialiasPixel(color, colorFrom24Bit(pixelGrid.pixels[y * pixelGrid.width + x - 1]), colorFrom24Bit(pixelGrid.pixels[(y - 1) * pixelGrid.width + x]));
-                    }*/
                     color32 = colorTo24Bit(color);
+                    pixelGrid.pixels[(y * pixelGrid.width + x)] = color32;
+                    if (x >=  3 * pixelGrid.width / 4 - 20)
+                    {
+                        InvalidateRect(window_handle, NULL, FALSE);
+                        UpdateWindow(window_handle);
+                    }           
+                }     
+            }
+            color32 = colorTo24Bit(newColor(0, 0, 0));
+            for (x = 0; x < pixelGrid.width; x++)
+            {
+                for (y = 0; y < pixelGrid.height; y++)
+                {
                     pixelGrid.pixels[(y * pixelGrid.width + x)] = color32;
                 }
             }
