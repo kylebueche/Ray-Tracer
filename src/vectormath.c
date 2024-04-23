@@ -1,7 +1,7 @@
 #include "vectormath.h"
 #include "mymath.h"
 #include <stdio.h>
-/*
+
 Vector newVector(const double x, const double y, const double z)
 {
     Vector v;
@@ -107,7 +107,7 @@ double vecDot(const Vector a, const Vector b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
-*/
+
 /**
 Vector vecCross(const Vector a, const Vector b)
 {

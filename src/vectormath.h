@@ -9,7 +9,7 @@ typedef struct vector
 {
     double x, y, z;
 } Vector;
-/*
+
 void vecAdd(Vector *a, const Vector b);
 void vecSub(Vector *a, const Vector b);
 Vector vecMult(Vector a, double b);
@@ -26,7 +26,7 @@ Vector vecNormal(Vector a);
 double vecDot(const Vector a, const Vector);
 Vector vecCross(const Vector a, const Vector);
 Vector newVector(const double x, const double y, const double z);
-*/
+/*
 static inline Vector newVector(const double x, const double y, const double z)
 {
     Vector v;
@@ -132,5 +132,5 @@ static inline double vecDot(const Vector a, const Vector b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
-
+*/
 #endif

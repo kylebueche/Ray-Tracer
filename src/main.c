@@ -61,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     RegisterClass(&window_class);
 
     window_handle = CreateWindow(
-                            (PCSTR)window_class_name, "Graphics Engine", WS_OVERLAPPEDWINDOW,
+                            (PCSTR)window_class_name, "Graphics Engine", WS_OVERLAPPEDWINDOW|WS_MAXIMIZE,
                             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                             NULL, NULL, hInstance, NULL
                             );
@@ -72,8 +72,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     else
     {
         ShowWindow(window_handle, nCmdShow);
-	    samplesx = 1;
-        samplesy = 1;
+	    samplesx = 5;
+        samplesy = 5;
     	camDepth = 1.0;
 	    camWidth = 1.0;
         ray.position.x = 0.0;
@@ -91,8 +91,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
                                           newColor(0.0, 0.25, 1.0), 1.0));
         loadLight(&lights, newPointLight(newVector(-0.1, -1.0, 10.0),
                                        newColor(1.0, 1.0, 1.0), 1.0, 1.0));
-        /*loadLight(&lights, newPointLight(newVector(3.0, 1.8, 10.0),
-                                            newColor(1.0, 1.0, 1.0), 0.0));*/
+        loadLight(&lights, newSun(newVector(1.0, 1.0, 1.0),
+                                            newColor(1.0, 1.0, 1.0), 1.0));
         numberOfReflections = 4;
 
         while (!quit)
@@ -129,21 +129,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
                     color = colorMult(color, (1.0 / (samplesx * samplesy)));
                     color32 = colorTo24Bit(color);
                     pixelGrid.pixels[(y * pixelGrid.width + x)] = color32;
-                    if (x >=  3 * pixelGrid.width / 4 - 20)
+                    /*if (x == 1416 && y >= 460)
+                    */
+                    if (x % 64 == 0 && y == 0)
                     {
                         InvalidateRect(window_handle, NULL, FALSE);
                         UpdateWindow(window_handle);
-                    }           
+                    }          
                 }     
             }
-            color32 = colorTo24Bit(newColor(0, 0, 0));
+            /*color32 = colorTo24Bit(newColor(0, 0, 0));
             for (x = 0; x < pixelGrid.width; x++)
             {
                 for (y = 0; y < pixelGrid.height; y++)
                 {
                     pixelGrid.pixels[(y * pixelGrid.width + x)] = color32;
                 }
-            }
+            }*/
             printf("|");
             InvalidateRect(window_handle, NULL, FALSE);
             UpdateWindow(window_handle);
