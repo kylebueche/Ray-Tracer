@@ -25,7 +25,7 @@ Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Colo
                                                                             objects,
                                                                             lights,
                                                                             skybox,
-                                                                            numberOfReflections
+                                                                            (int) (numberOfReflections * (1.0 - roughness))
                                                                             ), (1.0 - roughness))));
             return outputColor;
         }

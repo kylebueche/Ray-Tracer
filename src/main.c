@@ -72,8 +72,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     else
     {
         ShowWindow(window_handle, nCmdShow);
-	    samplesx = 5;
-        samplesy = 5;
+	    samplesx = 3;
+        samplesy = 3;
     	camDepth = 1.0;
 	    camWidth = 1.0;
         ray.position.x = 0.0;
@@ -89,11 +89,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
                                           newColor(1.0, 0.5, 0.4), 0.5));
         loadObject(&objects, newSphere(newVector(20.0, 0.0, -1.0), 1.0,
                                           newColor(0.0, 0.25, 1.0), 1.0));
-        loadLight(&lights, newPointLight(newVector(-0.1, -1.0, 10.0),
-                                       newColor(1.0, 1.0, 1.0), 1.0, 1.0));
+        loadLight(&lights, newPointLight(newVector(20, -1.0, 3),
+                                       newColor(1.0, 1.0, 1.0), 1.0, 0.5));
         loadLight(&lights, newSun(newVector(1.0, 1.0, 1.0),
                                             newColor(1.0, 1.0, 1.0), 1.0));
-        numberOfReflections = 4;
+        numberOfReflections = 10;
 
         while (!quit)
         {
