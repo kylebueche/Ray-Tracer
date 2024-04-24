@@ -63,7 +63,7 @@ Color sumOfLambertians(Ray normalRay, LightNode *lights, ObjectNode *objects)
                 }
                 break;
             case POINTLIGHT:
-                for (x = 0; x < 5; x++)
+                for (x = 0; x < 10; x++)
                 {
                     pointLightSample = vecMult(vecNormal(newVector((double) rand(), (double) rand(), (double) rand())), lights->light.pointLight.radius);
                     rayToLight.direction = vecsSub(vecsAdd(lights->light.pointLight.position, pointLightSample), rayToLight.position);
@@ -72,7 +72,7 @@ Color sumOfLambertians(Ray normalRay, LightNode *lights, ObjectNode *objects)
                     closest = findClosestObject(rayToLight, objects);
                     if (closest.distance <= 0.0 || closest.distance > lightDistance)
                     {
-                        incomingColor = colorSum(incomingColor, colorMult(colorFromLight(lights), vecDot(rayToLight.direction, normalRay.direction)/5.0));
+                        incomingColor = colorSum(incomingColor, colorMult(colorFromLight(lights), vecDot(rayToLight.direction, normalRay.direction)/10.0));
                     }
                 }
                 break;

@@ -29,3 +29,6 @@ mymath.o : mymath.c
 
 clean:
 	rm *.o
+	rm *.c~
+	rm *.h~
+	rm *.un~
