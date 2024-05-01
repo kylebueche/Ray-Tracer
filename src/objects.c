@@ -13,14 +13,17 @@ ObjectNode newPlane(Vector position, Vector normal, Color color, double roughnes
     return objectNode;
 }
 
-ObjectNode newSphere(Vector position, double radius, Color color, double roughness)
+ObjectNode newSphere(Vector position, double radius, Color color, double roughness, double transparency, double focaldistance, double glossiness)
 {
     ObjectNode objectNode;
     objectNode.type = SPHERE;
     objectNode.object.sphere.radius = radius;
     objectNode.object.sphere.position = position;
     objectNode.object.sphere.color = color;
-    objectNode.object.sphere.roughness = clamp(roughness); 
+    objectNode.object.sphere.roughness = clamp(roughness);
+    objectNode.object.sphere.transparency = clamp(transparency);
+    objectNode.object.sphere.focaldistance = focaldistance;
+    objectNode.object.sphere.glossiness = glossiness;
     objectNode.next = NULL;
     return objectNode;
 }

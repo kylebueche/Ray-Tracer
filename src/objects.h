@@ -4,13 +4,13 @@
 #include "vectormath.h"
 #include "lights.h"
 
-typedef enum objectType
+typedef enum
 {
     PLANE,
     SPHERE
 } ObjectType;
 
-typedef struct plane
+typedef struct
 {
     Vector normal;
     Vector position;
@@ -18,21 +18,24 @@ typedef struct plane
     double roughness;
 } Plane;
 
-typedef struct sphere
+typedef struct
 {
     double radius;
     Vector position;
     Color color;
     double roughness;
+    double transparency;
+    double focaldistance;
+    double glossiness;
 } Sphere;
  
-typedef union object
+typedef union
 {
     Plane plane;
     Sphere sphere;
 } Object;
 
-typedef struct objectNode
+typedef struct
 {
     Object object;
     ObjectType type;
@@ -40,7 +43,7 @@ typedef struct objectNode
 } ObjectNode;
 
 ObjectNode newPlane(Vector, Vector, Color, double);
-ObjectNode newSphere(Vector, double, Color, double);
+ObjectNode newSphere(Vector, double, Color, double, double transparency, double focaldistance, double glossiness);
 
 Vector objectPosition(ObjectNode *);
 Vector objectNormal(ObjectNode *, Vector);

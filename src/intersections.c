@@ -67,14 +67,24 @@ double intersectsSphere(Ray ray, Sphere sphere)
     double b;
     double c;
     double insideSqrt;
+    double root;
+    double i1;
+    double i2;
     if (a != 0.0)
     {
         b = 2.0 * vecDot(origin, ray.direction);
         c = vecDot(origin, origin) - (sphere.radius * sphere.radius);
-        insideSqrt = sqr(b) - (4.0 * a * c);
+        insideSqrt = (b * b) - (4.0 * a * c);
         if (insideSqrt >= 0.0)
         {
-            returnVal = ((0.0 - b) - sqrt(insideSqrt)) / (2.0 * a);
+            root = sqrt(insideSqrt);
+            i1 = ((0.0 - b) - root) / (2.0 * a);
+            i2 = ((0.0 - b) + root) / (2.0 * a);
+            returnVal = min(max(i1, 0.0), max(i2, 0.0));
+            if (returnVal == 0.0)
+            {
+                returnVal = -1.0;
+            }
         }
     }
     return returnVal;

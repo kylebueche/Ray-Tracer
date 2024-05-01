@@ -92,3 +92,12 @@ Ray reflection(Ray incoming, Ray normal)
     reflected.direction = vecsSub(vecMult(vecsAdd(vecMult(normal.direction, vecDot(vecNeg(incoming.direction), normal.direction)), incoming.direction), 2), incoming.direction);
     return reflected;
 }
+
+Ray focalRay(Ray incoming, Vector sphereCenter, double focaldistance)
+{
+    Ray outgoing = { 0 };
+    outgoing.position = findClosestObject
+    Vector focalPoint = vecMult(vecNormal(vecsSub(sphereCenter, incoming.position), focaldistance));
+
+
+
