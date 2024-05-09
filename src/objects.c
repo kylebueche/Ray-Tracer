@@ -1,6 +1,6 @@
 #include "objects.h"
 
-ObjectNode newPlane(Vector position, Vector normal, Color color, double roughness)
+ObjectNode newPlane(Vector position, Vector normal, Color color, double roughness, double transparency, double refractiveIndex, double glossiness)
 {
     ObjectNode objectNode;
     objectNode.type = PLANE;
@@ -9,11 +9,14 @@ ObjectNode newPlane(Vector position, Vector normal, Color color, double roughnes
     vecNormalize(&objectNode.object.plane.normal);
     objectNode.object.plane.color = color;
     objectNode.object.plane.roughness = clamp(roughness);
+    objectNode.object.plane.transparency = clamp(transparency);
+    objectNode.object.plane.refractiveIndex = refractiveIndex;
+    objectNode.object.plane.glossiness = clamp(glossiness);
     objectNode.next = NULL;
     return objectNode;
 }
 
-ObjectNode newSphere(Vector position, double radius, Color color, double roughness, double transparency, double focaldistance, double glossiness)
+ObjectNode newSphere(Vector position, double radius, Color color, double roughness, double transparency, double refractiveIndex, double glossiness)
 {
     ObjectNode objectNode;
     objectNode.type = SPHERE;
@@ -22,8 +25,8 @@ ObjectNode newSphere(Vector position, double radius, Color color, double roughne
     objectNode.object.sphere.color = color;
     objectNode.object.sphere.roughness = clamp(roughness);
     objectNode.object.sphere.transparency = clamp(transparency);
-    objectNode.object.sphere.focaldistance = focaldistance;
-    objectNode.object.sphere.glossiness = glossiness;
+    objectNode.object.sphere.refractiveIndex = refractiveIndex;
+    objectNode.object.sphere.glossiness = clamp(glossiness);
     objectNode.next = NULL;
     return objectNode;
 }
@@ -75,6 +78,32 @@ double objectRoughness(ObjectNode *objectPtr)
             return objectPtr->object.plane.roughness;
         case SPHERE:
             return objectPtr->object.sphere.roughness;
+        default:
+            return 1.0;
+    }
+}
+
+double objectTransparency(ObjectNode *objectPtr)
+{
+    switch(objectPtr->type)
+    {
+        case PLANE:
+            return objectPtr->object.plane.transparency;
+        case SPHERE:
+            return objectPtr->object.sphere.transparency;
+        default:
+            return 0.0;
+    }
+}
+
+double objectRefractiveIndex(ObjectNode *objectPtr)
+{
+    switch(objectPtr->type)
+    {
+        case PLANE:
+            return objectPtr->object.plane.refractiveIndex;
+        case SPHERE:
+            return objectPtr->object.sphere.refractiveIndex;
         default:
             return 1.0;
     }

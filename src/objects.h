@@ -16,6 +16,9 @@ typedef struct
     Vector position;
     Color color;
     double roughness;
+    double transparency;
+    double refractiveIndex;
+    double glossiness;
 } Plane;
 
 typedef struct
@@ -25,7 +28,7 @@ typedef struct
     Color color;
     double roughness;
     double transparency;
-    double focaldistance;
+    double refractiveIndex;
     double glossiness;
 } Sphere;
  
@@ -35,19 +38,21 @@ typedef union
     Sphere sphere;
 } Object;
 
-typedef struct
+typedef struct objectNode
 {
     Object object;
     ObjectType type;
     struct objectNode *next;
 } ObjectNode;
 
-ObjectNode newPlane(Vector, Vector, Color, double);
-ObjectNode newSphere(Vector, double, Color, double, double transparency, double focaldistance, double glossiness);
+ObjectNode newPlane(Vector, Vector, Color, double, double, double, double);
+ObjectNode newSphere(Vector, double, Color, double, double transparency, double refractiveIndex, double glossiness);
 
 Vector objectPosition(ObjectNode *);
 Vector objectNormal(ObjectNode *, Vector);
 Color objectColor(ObjectNode *);
 double objectRoughness(ObjectNode *);
+double objectTransparency(ObjectNode *);
+double objectRefractiveIndex(ObjectNode *);
 
 #endif

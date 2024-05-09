@@ -2,6 +2,7 @@
 #include "vectormath.h"
 #include "objects.h"
 #include "lights.h"
+#include <math.h>
 
 
 /** returns closest object and its distance, or negative dist if no valid intersections occur **/
@@ -80,7 +81,7 @@ double intersectsSphere(Ray ray, Sphere sphere)
             root = sqrt(insideSqrt);
             i1 = ((0.0 - b) - root) / (2.0 * a);
             i2 = ((0.0 - b) + root) / (2.0 * a);
-            returnVal = min(max(i1, 0.0), max(i2, 0.0));
+            returnVal = fmin(fmax(i1, 0.0), fmax(i2, 0.0));
             if (returnVal == 0.0)
             {
                 returnVal = -1.0;

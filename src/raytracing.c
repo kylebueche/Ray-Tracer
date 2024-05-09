@@ -1,12 +1,15 @@
 #include "raytracing.h"
 #include <stdio.h>
 #include <stdlib.h>
+#define NORMALMARCH 0.0001
 
 Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Color skybox, int numberOfReflections)
 {
     Color outputColor = skybox;
     Color color = { 0 };
     double roughness;
+    double transparency;
+    double refractiveIndex;
     Intersection intersection = findClosestObject(ray, objects);
     Ray normalRay = { 0 };
     Color lambertianContribution;
@@ -19,9 +22,11 @@ Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Colo
         {
             normalRay.position = vecsAdd(ray.position, vecMult(ray.direction, intersection.distance));
             normalRay.direction = objectNormal(intersection.objectPtr, normalRay.position);
-            normalRay.position = vecsAdd(normalRay.position, vecMult(normalRay.direction, 0.0001));
+            normalRay.position = vecsAdd(normalRay.position, vecMult(normalRay.direction, NORMALMARCH));
             color = objectColor(intersection.objectPtr);
             roughness = objectRoughness(intersection.objectPtr);
+            transparency = objectTransparency(intersection.objectPtr);
+            refractiveIndex = objectRefractiveIndex(intersection.objectPtr);
             lambertianContribution = colorMult(sumOfLambertians(normalRay, lights, objects), roughness);
             reflectiveContribution = colorMult(traceRay(
                                                         reflection(ray, normalRay),
@@ -31,12 +36,12 @@ Color traceRay(const Ray ray, ObjectNode *objects, LightNode *lights, const Colo
                                                         (int) (numberOfReflections * (1.0 - roughness))
                                                         ), (1.0 - roughness));
             refractiveContribution = colorMult(traceRay(
-                                                        refraction(ray, normalRay),
+                                                        refraction(ray, normalRay, intersection.distance, refractiveIndex),
                                                         objects,
                                                         lights,
                                                         skybox,
                                                         (int) (numberOfReflections * (transparency))
-                                                        ), (transparency))
+                                                        ), (transparency));
             outputColor = colorProd(color, colorSum(lambertianContribution,
                                                     colorSum(reflectiveContribution,
                                                              refractiveContribution)));
@@ -106,11 +111,46 @@ Ray reflection(Ray incoming, Ray normal)
     return reflected;
 }
 
-Ray focalRay(Ray incoming, Vector sphereCenter, double focaldistance)
+Ray refraction(Ray incoming, Ray normal, double intersectionDist, double objectIndex)
 {
-    Ray outgoing = { 0 };
-    outgoing.position = findClosestObject
-    Vector focalPoint = vecMult(vecNormal(vecsSub(sphereCenter, incoming.position), focaldistance));
-
-
-
+    Ray refracted;
+    Ray perpendicular;
+    double airIndex = 1.000293;
+    double index1, index2;
+    double dot = vecDot(vecNormal(incoming.direction), normal.direction);
+    double h1 = intersectionDist;
+    double o1, a1, o2, a2;
+    Ray negnormal = normal;
+    refracted.position = normal.position;
+    if (dot == 0) /* ray is perpendicular to the surface, does not cross */
+    {
+        refracted.direction = incoming.direction;
+    }
+    else
+    {
+        if (dot < 0) /* ray goes from air into the current object */
+        {
+            index1 = airIndex;
+            index2 = objectIndex;
+            negnormal.direction = vecNeg(negnormal.direction);
+            refracted.position = vecsAdd(refracted.position, vecMult(normal.direction, -2*NORMALMARCH));
+        }
+        else if (dot > 0) /* ray goes from inside the object out to the atmosphere */
+        {
+            index1 = objectIndex;
+            index2 = airIndex;
+            normal.direction = vecNeg(normal.direction);
+            dot = vecDot(vecNormal(vecNeg(incoming.direction)), normal.direction);
+        }
+        a1 = dot * h1;
+        o1 = sqrt(h1*h1 - a1*a1);
+        o2 = index1 * o1 / (index2 * intersectionDist);
+        a2 = sqrt(1 - o2 * o2);
+        perpendicular.position = incoming.position;
+        perpendicular.direction = vecsAdd(normal.position, vecMult(normal.direction, a1));
+        vecNormalize(&(perpendicular.direction));
+        perpendicular.position = normal.position;
+        refracted.direction = vecNormal(vecsAdd(vecsAdd(perpendicular.position, vecMult(perpendicular.direction, o2)), vecsAdd(normal.position, vecMult(normal.direction, a2))));
+    }
+    return refracted;
+}

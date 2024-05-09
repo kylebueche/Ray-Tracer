@@ -82,17 +82,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
         skybox = colorMult(newColor(0.56, 1.0, 1.0), 1.0);
         loadObject(&objects, newPlane(newVector(0.0, 0.0, -1.0),
                                          newVector(0.0, 0.0, 1.0),
-                                         newColor(1.0, 1.0, 1.0), 1.0));
+                                         newColor(1.0, 1.0, 1.0), 1.0, 0.0, 1.0, 1.0));
         loadObject(&objects, newSphere(newVector(20.0, -6.0, 1.0), 2.0,
-                                          newColor(1.0, 0.8, 0.8), 0.1));
+                                          newColor(1.0, 0.8, 0.8), 0.1, 0.0, 1.0, 1.0));
         loadObject(&objects, newSphere(newVector(6.0, 1.0, -0.1), 0.5,
-                                          newColor(1.0, 0.5, 0.4), 0.5));
-        loadObject(&objects, newSphere(newVector(20.0, 0.0, -1.0), 1.0,
-                                          newColor(0.0, 0.25, 1.0), 1.0));
-        loadLight(&lights, newPointLight(newVector(20, -1.0, 3),
+                                          newColor(1.0, 0.5, 0.4), 0.5, 0.0, 1.0, 1.0));
+        loadObject(&objects, newSphere(newVector(10.0, -2.0, 0.0), 1.0,
+                                          newColor(0.7, 0.7, 1.0), 1.0, 0.5, 1.25, 1.0));
+        loadLight(&lights, newPointLight(newVector(15, -1.0, 0.0),
                                        newColor(1.0, 1.0, 1.0), 1.0, 0.5));
-        loadLight(&lights, newSun(newVector(1.0, 1.0, 1.0),
-                                            newColor(1.0, 1.0, 1.0), 1.0));
+        loadLight(&lights, newSun(newVector(-0.2, 0.0, 1.0),
+                                            newColor(1.0, 1.0, 1.0), 0.5));
         numberOfReflections = 10;
 
         while (!quit)
